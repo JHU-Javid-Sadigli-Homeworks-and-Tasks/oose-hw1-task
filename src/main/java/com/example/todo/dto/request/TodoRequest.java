@@ -10,6 +10,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,5 +23,6 @@ public class TodoRequest {
     private String description;
 
     @NotNull(message = "Deadline is required")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate deadline;
 }
