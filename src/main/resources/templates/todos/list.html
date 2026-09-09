@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Todo List</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="container">
+
+    <div class="top-bar">
+        <h1>My Todo List</h1>
+        <a class="btn btn-primary" th:href="@{/todos/new}">+ Add Task</a>
+    </div>
+
+    <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="card">
+
+        <form th:action="@{/todos}" method="get" class="filter-bar">
+            <input type="text" name="keyword" placeholder="Search by keyword..." th:value="${keyword}"/>
+
+            <select name="completed">
+                <option value="" th:selected="${completed == null}">All statuses</option>
+                <option value="false" th:selected="${completed != null and completed == false}">Pending</option>
+                <option value="true" th:selected="${completed != null and completed == true}">Completed</option>
+            </select>
+
+            <input type="hidden" name="sortBy" th:value="${sortBy}"/>
+            <input type="hidden" name="direction" th:value="${direction}"/>
+
+            <button type="submit" class="btn btn-secondary">Search / Filter</button>
+            <a class="btn btn-secondary" th:href="@{/todos}">Reset</a>
+        </form>
+
+        <table th:if="${not #lists.isEmpty(todos)}">
+            <thead>
+            <tr>
+                <th>
+                    <a th:href="@{/todos(keyword=${keyword}, completed=${completed}, sortBy='description', direction=${sortBy == 'description' and direction == 'asc' ? 'desc' : 'asc'})}">
+                        Description
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/todos(keyword=${keyword}, completed=${completed}, sortBy='deadline', direction=${sortBy == 'deadline' and direction == 'asc' ? 'desc' : 'asc'})}">
+                        Deadline
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/todos(keyword=${keyword}, completed=${completed}, sortBy='completed', direction=${sortBy == 'completed' and direction == 'asc' ? 'desc' : 'asc'})}">
+                        Status
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="todo : ${todos}" th:classappend="${todo.completed} ? 'completed' : ''">
+                <td th:text="${todo.description}"></td>
+                <td th:text="${#temporals.format(todo.deadline, 'dd MMM yyyy')}"></td>
+                <td>
+                    <span th:if="${todo.completed}" class="badge badge-completed">Completed</span>
+                    <span th:if="${!todo.completed and todo.overdue}" class="badge badge-overdue">Overdue</span>
+                    <span th:if="${!todo.completed and !todo.overdue}" class="badge badge-pending">Pending</span>
+                </td>
+                <td class="actions">
+                    <form th:if="${!todo.completed}" th:action="@{/todos/{id}/complete(id=${todo.id})}" method="post">
+                        <input type="hidden" name="completed" value="true"/>
+                        <button type="submit" class="btn btn-secondary btn-small">Mark done</button>
+                    </form>
+                    <form th:if="${todo.completed}" th:action="@{/todos/{id}/complete(id=${todo.id})}" method="post">
+                        <input type="hidden" name="completed" value="false"/>
+                        <button type="submit" class="btn btn-secondary btn-small">Reopen</button>
+                    </form>
+
+                    <a class="btn btn-secondary btn-small" th:href="@{/todos/{id}/edit(id=${todo.id})}">Edit</a>
+
+                    <form th:action="@{/todos/{id}/delete(id=${todo.id})}" method="post"
+                          onsubmit="return confirm('Delete this task?');">
+                        <button type="submit" class="btn btn-danger btn-small">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${#lists.isEmpty(todos)}" class="empty-state">
+            No tasks found. Try adjusting your search or filters, or add a new task.
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
