@@ -72,11 +72,11 @@ At runtime, three containers run together via Docker Compose:
 │ (Spring MVC) │     │ (port 5433  │
 │ port 8080    │     │ on host)    │
 └──────────────┘     └──────┬──────┘
-                           │
-                    ┌──────┴──────┐
-                    │ pgadmin     │
-                    │ port 5050   │
-                    └─────────────┘
+                            │
+                     ┌──────┴──────┐
+                     │ pgadmin     │
+                     │ port 5050   │
+                     └─────────────┘
 ```
 
 `todo-app` reaches Postgres over the internal Docker network using the service name `postgres` and Postgres's internal port `5432` — the `5433` host-side mapping is only for connecting from your own machine (e.g. via a local SQL client).
